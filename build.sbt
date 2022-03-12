@@ -11,7 +11,9 @@ val commonSettings = Seq(
   libraryDependencies ++= Seq(
      Dependencies.http4sDsl,
      Dependencies.http4sBlazeServer,
-     Dependencies.http4sBlazeClient
+     Dependencies.http4sBlazeClient,
+     Dependencies.http4sCirce,
+     Dependencies.circeGeneric
   )
 )
 
