@@ -13,7 +13,12 @@ val commonSettings = Seq(
      Dependencies.http4sBlazeServer,
      Dependencies.http4sBlazeClient,
      Dependencies.http4sCirce,
-     Dependencies.circeGeneric
+     Dependencies.circeGeneric,
+     Dependencies.tapirCore,
+     Dependencies.tapirHttp4sServer,
+     Dependencies.tapirSwaggerUi,
+     Dependencies.tapirOpenapiDocs,
+     Dependencies.tapirOpenapiCirceYaml
   )
 )
 
