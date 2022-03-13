@@ -18,4 +18,18 @@ object Dependencies {
   val tapirSwaggerUi = "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui" % tapirVersion
   val tapirOpenapiDocs = "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs" % tapirVersion
   val tapirOpenapiCirceYaml = "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % tapirVersion
+  val tapirJsonCirce = "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion
+
+  val doobieVersion = "1.0.0-RC1"
+  val doobieCore = "org.tpolecat" %% "doobie-core" % doobieVersion
+  val doobieH2 = "org.tpolecat" %% "doobie-h2" % doobieVersion
+  val doobiePostgres = "org.tpolecat" %% "doobie-postgres" % doobieVersion
+
+  val scalaLoggingVersion = "3.9.4"
+  val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion
+
+  val logbackVersion = "1.2.10"
+  val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
+
+  val h2 = "com.h2database" % "h2" % "1.4.197"
 }

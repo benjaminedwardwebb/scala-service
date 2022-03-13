@@ -4,11 +4,10 @@ ThisBuild / organizationName := "just playing around"
 ThisBuild / versionScheme := Some("early-semver")
 ThisBuild / scalaVersion := "3.1.0"
 
-lazy val root = (project in file("."))
-  .aggregate(service)
+lazy val root = service
 
-val commonSettings = Seq(
-  libraryDependencies ++= Seq(
+val service = project
+  .settings(libraryDependencies ++= Seq(
      Dependencies.http4sDsl,
      Dependencies.http4sBlazeServer,
      Dependencies.http4sBlazeClient,
@@ -18,9 +17,11 @@ val commonSettings = Seq(
      Dependencies.tapirHttp4sServer,
      Dependencies.tapirSwaggerUi,
      Dependencies.tapirOpenapiDocs,
-     Dependencies.tapirOpenapiCirceYaml
-  )
-)
-
-val service = project
-  .settings(commonSettings)
+     Dependencies.tapirOpenapiCirceYaml,
+     Dependencies.tapirJsonCirce,
+     Dependencies.doobieCore,
+     Dependencies.doobieH2,
+     Dependencies.scalaLogging,
+     Dependencies.logbackClassic,
+     Dependencies.h2
+  ))

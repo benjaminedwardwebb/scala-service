@@ -40,6 +40,6 @@ object TapirService:
   val serverEndpoints: List[ServerEndpoint[Fs2Streams[IO], IO]] = List(
     helloEndpoint.serverLogic(hello),
     countCharactersEndpoint.serverLogic(countCharacters)
-  ) ++: SwaggerUI[IO](docs.toYaml, swaggerUiOptions)
+  ) //++: SwaggerUI[IO](docs.toYaml, swaggerUiOptions)
 
   val httpRoutes: HttpRoutes[IO] = Http4sServerInterpreter[IO]().toRoutes(serverEndpoints)
