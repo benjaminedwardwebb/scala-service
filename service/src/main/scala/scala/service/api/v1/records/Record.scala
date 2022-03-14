@@ -1,12 +1,9 @@
-package scala.service.api.doobie
+package scala.service.api.v1.records
 
-import cats.effect.IO
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.{Decoder, Encoder}
 import java.util.UUID
-import org.http4s.{HttpRoutes, EntityEncoder}
 import sttp.tapir.Schema
-import sttp.tapir.json.circe._
 
 case class Record(id: UUID, x: String, y: Int, z: Boolean)
 

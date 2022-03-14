@@ -1,4 +1,4 @@
-package scala.service.api.doobie
+package scala.service.api.v1.records
 
 import cats.effect.{IO, Resource}
 import com.typesafe.scalalogging.Logger
@@ -7,11 +7,38 @@ import doobie.h2.H2Transactor
 import doobie.syntax.all.{toSqlInterpolator, toConnectionIOOps}
 import doobie.{ConnectionIO, ExecutionContexts, Meta}
 import java.util.UUID
-import scala.concurrent.ExecutionContext
 
-object DoobieDatabase:
+trait RecordsDatabase:
+  def list: IO[Seq[Record]]
+  def get(id: UUID): IO[Option[Record]]
+  def create(record: Record): IO[Record]
 
-  private val logger: Logger = Logger[DoobieDatabase.type]
+
+object RecordsDatabase extends RecordsDatabase:
+
+  def initialize: IO[RecordsDatabase] = for {
+    _ <- IO.blocking({ logger.debug("Dropping records table if it exists and then creating it.") })
+    _ <- transactor.use({ xa =>
+      dropTableIfExistsAndThenCreateTable.transact(xa)
+    })
+    _ <- IO.blocking({ logger.debug("Dropped and created records table.") })
+    _ <- IO.blocking({ logger.info("Initialized RecordsDatabase.") })
+    database = this
+  } yield database
+
+  def list: IO[Seq[Record]] = transactor.use { xa =>
+    selectAll.transact(xa)
+  }
+
+  def get(id: UUID): IO[Option[Record]] = transactor.use { xa =>
+    selectById(id).transact(xa)
+  }
+
+  def create(record: Record): IO[Record] = transactor.use { xa =>
+    insert(record).transact(xa)
+  }
+
+  private val logger: Logger = Logger[RecordsDatabase]
 
   private implicit val logHandler: LogHandler = LogHandler.jdkLogHandler
 
@@ -20,14 +47,12 @@ object DoobieDatabase:
   private val transactor: Resource[IO, H2Transactor[IO]] = {
     for {
       executionContexts <- ExecutionContexts.fixedThreadPool[IO](32) // our connect EC
-      _ = logger.info("created h2 xa")
       xa <- H2Transactor.newH2Transactor[IO](
         "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", // connect URL
         "sa",                           // username
         "",                           // password
         executionContexts,                    // await connection here
       )
-      _ = logger.info("created h2 xa")
     } yield xa
   }
 
@@ -46,29 +71,13 @@ object DoobieDatabase:
     """.update.run
   } yield ()
 
-  def initialize: IO[Unit] = for {
-    _ <- IO { logger.info("Dropping records table if it exists and then creating it.") }
-    _ <- transactor.use { xa =>
-      dropTableIfExistsAndThenCreateTable.transact(xa)
-    }
-    _ <- IO { logger.info("Dropped and created records table.") }
-  } yield ()
-
   private def selectAll: ConnectionIO[Seq[Record]] = for {
     records <- sql"select * from records".query[Record].to[Seq]
   } yield records
 
-  def list: IO[Seq[Record]] = transactor.use { xa =>
-    selectAll.transact(xa)
-  }
-
   private def selectById(id: UUID): ConnectionIO[Option[Record]] = for {
     record <- sql"select * from records where id = $id".query[Record].option
   } yield record
-
-  def get(id: UUID): IO[Option[Record]] = transactor.use { xa =>
-    selectById(id).transact(xa)
-  }
 
   private def insert(record: Record): ConnectionIO[Record] = for {
     id <- sql"""
@@ -77,7 +86,3 @@ object DoobieDatabase:
     """.update.withUniqueGeneratedKeys[UUID]("id")
     record <- sql"select * from records where id = $id".query[Record].unique
   } yield record
-
-  def post(record: Record): IO[Record] = transactor.use { xa =>
-    insert(record).transact(xa)
-  }
